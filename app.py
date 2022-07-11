@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from flask import Flask, render_template, jsonify
 
 app = Flask(__name__)
@@ -56,3 +57,17 @@ def comment():
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
+=======
+<<<<<<< HEAD
+print('aaabbbb')
+
+# 뭐가 뭔지 모르겠습니다.
+
+print('흑')
+=======
+print('aaa111bbbb')
+print('aaa111bbbb')
+print('aaa111bbbb')
+print('aaa111bbbb')
+>>>>>>> 394eff23e9466dd67dce0ad75580ca7c71c4e881
+>>>>>>> fc407bab98ca776aead01e43c9969efa15edc104
