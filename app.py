@@ -1,73 +1,67 @@
-<<<<<<< HEAD
-from flask import Flask, render_template, jsonify
-
+from flask import Flask, render_template, jsonify, request
 app = Flask(__name__)
 
+
 from pymongo import MongoClient
-client = MongoClient('mongodb+srv://test:sparta123@cluster0.g2dpd.mongodb.net/Cluster0?retryWrites=true&w=majority')
+import certifi
+
+ca = certifi.where()
+
+client = MongoClient('mongodb+srv://test:sparta@cluster0.a5dm1.mongodb.net/Cluster0?retryWrites=true&w=majority',
+                     tlsCAFile=ca)
 db = client.dbsparta
 
-@app.route('/login')
-def log():
-    return render_template('login.html')
 
-@app.route('/member')
-def member():
-    return render_template('member.html')
+from datetime import datetime
 
-# @app.route("/login")
-# def comment_page():
-#     return render_template("comment.html")
+## HTML을 주는 부분
+@app.route('/')
+def home():
+    return render_template('index2.html')
 
 
-@app.route("/homework", methods=["POST"])
-# def homework_post():
-#     nickname_receive = request.form['nickname_give']
-#     comment_receive = request.form['comment_give']
-#     comment_list = list(db.homework.find({}, {'_id': False}))
-#     count = len(comment_list) + 1
-#
-#     if(nickname_receive == ""):
-#         return jsonify({'msg': '닉네임을 입력하시오'})
-#     elif(comment_receive==""):
-#         return jsonify({'msg': '댓글을 입력하시오'})
-#     else:
-#         doc = {
-#             'num': count,
-#             'nickname' : nickname_receive,
-#             'comment': comment_receive
-#         }
-#         db.homework.insert_one(doc)
-#
-#     return jsonify({'msg': '댓글 작성 완료!'})
-
-@app.route("/homework", methods=["GET"])
-def homework_get():
-    users = list(db.homework.find({}, {'_id': False}))
+@app.route('/register')
+def regi():
+    return render_template('index.html')
 
 
-    return jsonify({'users': users})\
+## API 역할을 하는 부분
+@app.route('/memo', methods=['POST'])
+def saving():
+
+    desc_receive = request.form['desc_give']
+    price_receive = request.form['price_give']
+
+    file = request.files["file_give"]
+
+    extension = file.filename.split('.')[-1]
+
+    today = datetime.now()
+    mytime = today.strftime('%Y-%m-%H-%M-%S')
+
+    imagename = f'file-{mytime}'
 
 
-@app.route("/comment")
-def comment():
-    return  "comment page"
+    save_to = f'static/{imagename}.{extension}'
+    file.save(save_to)
 
+    doc = {
+
+        'desc':desc_receive,
+        'price':price_receive,
+        'file': f'{imagename}.{extension}'
+    }
+
+    db.cars.insert_one(doc)
+
+    return jsonify({'msg':'등록이 완료되었습니다!'})
+
+
+@app.route("/memo", methods=["GET"])
+def web_mars_get():
+    car_list = list(db.cars.find({}, {'_id': False}))
+    return jsonify({'drcars':car_list})
 
 
 if __name__ == '__main__':
-    app.run('0.0.0.0', port=5000, debug=True)
-=======
-<<<<<<< HEAD
-print('aaabbbb')
-
-# 뭐가 뭔지 모르겠습니다.
-
-print('흑')
-=======
-print('aaa111bbbb')
-print('aaa111bbbb')
-print('aaa111bbbb')
-print('aaa111bbbb')
->>>>>>> 394eff23e9466dd67dce0ad75580ca7c71c4e881
->>>>>>> fc407bab98ca776aead01e43c9969efa15edc104
+   app.run('0.0.0.0',port=5000,debug=True)
