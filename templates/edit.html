@@ -1,140 +1,19 @@
 <!doctype html>
 <html lang="en">
+
 <head>
-
-    <!-- Webpage Title -->
-    <title>Log In | SWEETER</title>
-
-    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Bulma CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
-    <!-- Font Awesome CSS -->
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-
-    {#    boot strap#}
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-
-    <!-- JS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
 
-    <script>
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <title>마이 드림카</title>
 
-        function toggle_like(post_id, type) {
-    console.log(post_id, type)
-    let $a_like = $(`#${post_id} a[aria-label='thumbs-up']`)
-    let $i_like = $a_like.find("i")
-    if ($i_like.hasClass("fa-thumbs-up")) {
-        $.ajax({
-            type: "POST",
-            url: "/update_like",
-            data: {
-                post_id_give: post_id,
-                type_give: type,
-                action_give: "unlike"
-            },
-            success: function (response) {
-                console.log("unlike")
-                $i_like.addClass("fa-thumbs-o-up").removeClass("fa-thumbs-up")
-                $a_like.find("span.like-num").text(response["count"])
-            }
-        })
-    } else {
-        $.ajax({
-            type: "POST",
-            url: "/update_like",
-            data: {
-                post_id_give: post_id,
-                type_give: type,
-                action_give: "like"
-            },
-            success: function (response) {
-                console.log("like")
-                $i_like.addClass("fa-thumbs-up").removeClass("fa-thumbs-o-up")
-                $a_like.find("span.like-num").text(response["count"])
-            }
-        })
-
-    }
-}
-
-        function get_posts(username) {
-    if (username == undefined) {
-        username = ""
-    }
-    $("#post-box").empty()
-    $.ajax({
-        type: "GET",
-        url: `/get_posts?username_give=${username}`,
-        data: {},
-        success: function (response) {
-            if (response["result"] == "success") {
-                let posts = response["posts"]
-                for (let i = 0; i < posts.length; i++) {
-                    let post = posts[i]
-                    let time_post = new Date(post["date"])
-                    let time_before = time2str(time_post)
-                    let class_heart = post['heart_by_me'] ? "fa-thumbs-up" : "fa-thumbs-o-up"
-                    let count_heart = post['count_heart']
-                    let html_temp = `<div class="box" id="${post["_id"]}">
-                                        <article class="media">
-                                            <div class="media-left">
-                                                <a class="image is-64x64" href="/user/${post['username']}">
-                                                    <img class="is-rounded" src="/static/${post['profile_pic_real']}"
-                                                         alt="Image">
-                                                </a>
-                                            </div>
-                                            <div class="media-content">
-                                                <div class="content">
-                                                    <p>
-                                                        <strong>${post['profile_name']}</strong> <small>@${post['username']}</small> <small>${time_before}</small>
-                                                        <br>
-                                                        ${post['comment']}
-                                                    </p>
-                                                </div>
-                                                <nav class="level is-mobile">
-                                                    <div class="level-left">
-                                                        <a class="level-item is-sparta" aria-label="thumbs-up" onclick="toggle_like('${post['_id']}', 'thumbs-up')">
-                                                            <span class="icon is-small"><i class="fa ${class_heart}"
-                                                                                           aria-hidden="true"></i></span>&nbsp;<span class="like-num">${count_heart}</span>
-                                                        </a>
-                                                    </div>
-
-                                                </nav>
-                                            </div>
-                                        </article>
-                                    </div>`
-                    $("#post-box").append(html_temp)
-                }
-            }
-        }
-    })
-}
-
-                function time2str(date) {
-                    let today = new Date()
-                    let time = (today - date) / 1000 / 60  // 분
-
-                    if (time < 60) {
-                        return parseInt(time) + "분 전"
-                    }
-                    time = time / 60  // 시간
-                    if (time < 24) {
-                        return parseInt(time) + "시간 전"
-                    }
-                    time = time / 24
-                    if (time < 7) {
-                        return parseInt(time) + "일 전"
-                    }
-                    return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`
-                }
-
-
-    </script>
     <style>
         .title {
             color: white;
@@ -146,240 +25,155 @@
 
         }
 
+        .header {
+            margin-left: 85%;
+        }
+
+        .badge {
+            margin: 10px;
+        }
+
+        .btn {
+            margin: 20px 20px 20px 85%;
+        }
     </style>
+
+    <script>
+
+        $(document).ready(function () {
+            showArticles();
+        });
+            {#따봉 설정#}
+            function toggle_like(post_id, type) {
+            console.log(post_id, type)
+            let $a_like = $(`#${post_id} a[aria-label='thumbs-up']`)
+            let $i_like = $a_like.find("i")
+            if ($i_like.hasClass("fa-thumbs-up")) {
+                $.ajax({
+                    type: "POST",
+                    url: "/update_like",
+                    data: {
+                        post_id_give: post_id,
+                        type_give: type,
+                        action_give: "unlike"
+                    },
+                    success: function (response) {
+                        console.log("unlike")
+                        $i_like.addClass("fa-thumbs-o-up").removeClass("fa-thumbs-up")
+                        $a_like.find("span.like-num").text(response["count"])
+                    }
+                })
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: "/update_like",
+                    data: {
+                        post_id_give: post_id,
+                        type_give: type,
+                        action_give: "like"
+                    },
+                    success: function (response) {
+                        console.log("like")
+                        $i_like.addClass("fa-thumbs-up").removeClass("fa-thumbs-o-up")
+                        $a_like.find("span.like-num").text(response["count"])
+                    }
+                })
+
+            }
+        }
+
+         function sign_out() {
+            $.removeCookie('mytoken', {path: '/'});
+            alert('로그아웃 하셨습니다.!')
+            window.location.href = "/login"
+        }
+
+        {#시간설정#}
+        function time2str(date) {
+            let today = new Date()
+            let time = (today - date) / 1000 / 60  // 분
+
+            if (time < 60) {
+                return parseInt(time) + "분 전"
+            }
+            time = time / 60  // 시간
+            if (time < 24) {
+                return parseInt(time) + "시간 전"
+            }
+            time = time / 24
+            if (time < 7) {
+                return parseInt(time) + "일 전"
+            }
+            return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`
+        }
+
+
+        function showArticles(username) {
+            if (username == undefined) {
+                 username = ""
+                 }
+            $.ajax({
+                type: "GET",
+                url: "/memo",
+                data: {},
+                success: function (response) {
+
+                    let drcar = response['drcars']
+                    for (let i = 0; i < drcar.length; i++) {
+
+                        let desc = drcar[i]['desc']
+                        let price = drcar[i]['price']
+                        let file = drcar[i]['file']
+                        let username = drcar[i]['username']
+                        let post = drcar[i]
+                        let class_heart = post['heart_by_me'] ? "fa-thumbs-up" : "fa-thumbs-o-up"
+                        let count_heart = drcar['count_heart']
+
+
+                        let temp_html = `<div class="col">
+                                            <div class="card">
+                                              <img src="../static/${file}" class="card-img-top" alt="...">
+                                              <div class="card-body">
+                                                <h5 class="card-title">가격: ${price}</h5>
+                                               <h5 class="card-title">작성자:  ${username}</h5>
+                                                <p class="card-text">설명: ${desc}</p>
+                                                        <a class="level-item is-sparta" aria-label="thumbs-up" onclick="toggle_like('${post['_id']}', 'thumbs-up')">
+                                                            <span class="icon is-small"><i class="fa ${class_heart}"
+                                                                                           aria-hidden="true"></i></span>&nbsp;<span class="like-num">2.7k</span>
+                                                        </a>
+                                              </div>
+                                            </div>
+                                          </div>`
+
+                        $('#here').append(temp_html)
+                    }
+                }
+            })
+        }
+
+    </script>
 </head>
 
 <body>
-<div class="title">
-    <h1>My Dream Car</h1>
-</div>
-<div class="row row-cols-1 row-cols-md-4 g-4">
-    <div id="post-box" class="container">
-        <div class="box">
-            <div class="media-auto">
-                <a class="image is-200x200" href="#">
-                    <img img src="https://autodaybook.com/userfiles/42/1443_1.webp" class="card-img-top">
-                </a>
-            </div>
-            <div class="media-content">
-                <div class="content">
-                    <p>
-                        <strong>닉네임</strong> <small>작성시간</small>
-                        <br>
-                        <small>글 내용</small>
-                    </p>
-                    <nav class="level is-mobile">
-                        <div class="level-left">
-                            <a class="level-item is-sparta" aria-label="heart"
-                               onclick="toggle_like('', 'heart')">
-                                <span class="icon is-small"><i class="fa fa-thumbs-up"
-                                                               aria-hidden="true"></i></span>&nbsp;<span
-                                    class="like-num">2.7k</span>
-                            </a>
-                        </div>
 
-                    </nav>
-                </div>
-            </div>
-        </div>
+    <div class="title">
+         <h1><a href="/">My Dream Car</a></h1>
 
     </div>
-    <div id="post-box" class="container">
-        <div class="box">
-            <div class="media-auto">
-                <a class="image is-200x200" href="#">
-                    <img img src="https://autodaybook.com/userfiles/42/1443_1.webp" class="card-img-top">
-                </a>
-            </div>
-            <div class="media-content">
-                <div class="content">
-                    <p>
-                        <strong>닉네임</strong> <small>작성시간</small>
-                        <br>
-                        <small>글 내용</small>
-                    </p>
-                    <nav class="level is-mobile">
-                        <div class="level-left">
-                            <a class="level-item is-sparta" aria-label="heart"
-                               onclick="toggle_like('', 'heart')">
-                                <span class="icon is-small"><i class="fa fa-thumbs-up"
-                                                               aria-hidden="true"></i></span>&nbsp;<span
-                                    class="like-num">2.7k</span>
-                            </a>
-                        </div>
 
-                    </nav>
-                </div>
-            </div>
-        </div>
+    <div class="header">
+        <a href="/edit"><h4 class="nick">Nick</a>
+            <button class="badge bg-secondary" onclick="sign_out()">로그아웃</button></h4>
 
     </div>
-    <div id="post-box" class="container">
-        <div class="box">
-            <div class="media-auto">
-                <a class="image is-200x200" href="#">
-                    <img img src="https://autodaybook.com/userfiles/42/1443_1.webp" class="card-img-top">
-                </a>
-            </div>
-            <div class="media-content">
-                <div class="content">
-                    <p>
-                        <strong>닉네임</strong> <small>작성시간</small>
-                        <br>
-                        <small>글 내용</small>
-                    </p>
-                    <nav class="level is-mobile">
-                        <div class="level-left">
-                            <a class="level-item is-sparta" aria-label="heart"
-                               onclick="toggle_like('', 'heart')">
-                                <span class="icon is-small"><i class="fa fa-thumbs-up"
-                                                               aria-hidden="true"></i></span>&nbsp;<span
-                                    class="like-num">2.7k</span>
-                            </a>
-                        </div>
+    <a class="btn text-muted" href="/register">내 드림카 등록하기</a>
+    <p><a href="http://localhost:5000/webPro/index.html"></a></p>
 
-                    </nav>
-                </div>
-            </div>
-        </div>
 
+    <div class="row row-cols-1 row-cols-md-4 g-4" id="here">
     </div>
-    <div id="post-box" class="container">
-        <div class="box">
-            <div class="media-auto">
-                <a class="image is-200x200" href="#">
-                    <img img src="https://autodaybook.com/userfiles/42/1443_1.webp" class="card-img-top">
-                </a>
-            </div>
-            <div class="media-content">
-                <div class="content">
-                    <p>
-                        <strong>닉네임</strong> <small>작성시간</small>
-                        <br>
-                        <small>글 내용</small>
-                    </p>
-                    <nav class="level is-mobile">
-                        <div class="level-left">
-                            <a class="level-item is-sparta" aria-label="heart"
-                               onclick="toggle_like('', 'heart')">
-                                <span class="icon is-small"><i class="fa fa-thumbs-up"
-                                                               aria-hidden="true"></i></span>&nbsp;<span
-                                    class="like-num">2.7k</span>
-                            </a>
-                        </div>
 
-                    </nav>
-                </div>
-            </div>
-        </div>
 
-    </div>
-    <div id="post-box" class="container">
-        <div class="box">
-            <div class="media-auto">
-                <a class="image is-200x200" href="#">
-                    <img img src="https://autodaybook.com/userfiles/42/1443_1.webp" class="card-img-top">
-                </a>
-            </div>
-            <div class="media-content">
-                <div class="content">
-                    <p>
-                        <strong>닉네임</strong> <small>작성시간</small>
-                        <br>
-                        <small>글 내용</small>
-                    </p>
-                    <nav class="level is-mobile">
-                        <div class="level-left">
-                            <a class="level-item is-sparta" aria-label="heart"
-                               onclick="toggle_like('', 'heart')">
-                                <span class="icon is-small"><i class="fa fa-thumbs-up"
-                                                               aria-hidden="true"></i></span>&nbsp;<span
-                                    class="like-num">2.7k</span>
-                            </a>
-                        </div>
-
-                    </nav>
-                </div>
-            </div>
-        </div>
-
-    </div>
-    <div id="post-box" class="container">
-        <div class="box">
-            <div class="media-auto">
-                <a class="image is-200x200" href="#">
-                    <img img src="https://autodaybook.com/userfiles/42/1443_1.webp" class="card-img-top">
-                </a>
-            </div>
-            <div class="media-content">
-                <div class="content">
-                    <p>
-                        <strong>닉네임</strong> <small>작성시간</small>
-                        <br>
-                        <small>글 내용</small>
-                    </p>
-                    <nav class="level is-mobile">
-                        <div class="level-left">
-                            <a class="level-item is-sparta" aria-label="heart"
-                               onclick="toggle_like('', 'heart')">
-                                <span class="icon is-small"><i class="fa fa-thumbs-up"
-                                                               aria-hidden="true"></i></span>&nbsp;<span
-                                    class="like-num">2.7k</span>
-                            </a>
-                        </div>
-
-                    </nav>
-                </div>
-            </div>
-        </div>
-
-    </div>
-    <div id="post-box" class="container">
-        <div class="box">
-            <div class="media-auto">
-                <a class="image is-200x200" href="#">
-                    <img img src="https://autodaybook.com/userfiles/42/1443_1.webp" class="card-img-top">
-                </a>
-            </div>
-            <div class="media-content">
-                <div class="content">
-                    <p>
-                        <strong>닉네임</strong> <small>작성시간</small>
-                        <br>
-                        <small>글 내용</small>
-                    </p>
-                    <nav class="level is-mobile">
-                        <div class="level-left">
-                            <a class="level-item is-sparta" aria-label="heart"
-                               onclick="toggle_like('', 'heart')">
-                                <span class="icon is-small"><i class="fa fa-thumbs-up"
-                                                               aria-hidden="true"></i></span>&nbsp;<span
-                                    class="like-num">2.7k</span>
-                            </a>
-                        </div>
-
-                    </nav>
-                </div>
-            </div>
-        </div>
-
-    </div>
-    <div class="col">
-        <div class="card">
-            <img src="https://autodaybook.com/userfiles/42/1443_1.webp" class="card-img-top" alt="...">
-            <div class="card-body">
-                <h5 class="card-title">Car title</h5>
-                <a class="level-item is-sparta" aria-label="heart" onclick="toggle_like('', 'heart')">
-            <span class="icon is-small"><i class="fa fa-thumbs-up"
-                                           aria-hidden="true"></i></span>&nbsp;<span
-                        class="like-num">2.7k</span>
-                </a>
-                <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional
-                    content. This content is a little bit longer.</p>
-            </div>
-        </div>
-    </div>
-</div>
 
 </body>
 
