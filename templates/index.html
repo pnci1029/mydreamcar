@@ -8,13 +8,27 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Stylish&display=swap" rel="stylesheet">
+
     <title>마이 드림카</title>
 
     <style>
+        * {
+            font-family: "Stylish", sans-serif;
+        }
+
+        body {
+            background-color: RGBA(111, 110, 90, 0.2);
+            min-height: 100vh;
+        }
+
         .title {
             color: white;
             text-align: center;
@@ -23,221 +37,248 @@
             background-position: center;
             background-size: cover;
 
-        }
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
 
-        .header {
-            margin-left: 85%;
-        }
-
-        .badge {
-            margin: 10px;
         }
 
         .btn {
             margin: 20px 20px 20px 85%;
         }
+
+        .input-group {
+            float: left;
+        }
+
+        .modal-footer {
+            margin: auto;
+        }
+
+        .btnwrap {
+            margin: auto;
+        }
+
     </style>
 
     <script>
 
+
         $(document).ready(function () {
             showArticles();
+            showcomment();
+
         });
-            {#따봉 설정#}
-            function toggle_like(post_id, type) {
-            console.log(post_id, type)
-            let $a_like = $(`#${post_id} a[aria-label='thumbs-up']`)
-            let $i_like = $a_like.find("i")
-            if ($i_like.hasClass("fa-thumbs-up")) {
-                $.ajax({
-                    type: "POST",
-                    url: "/update_like",
-                    data: {
-                        post_id_give: post_id,
-                        type_give: type,
-                        action_give: "unlike"
-                    },
-                    success: function (response) {
-                        console.log("unlike")
-                        $i_like.addClass("fa-thumbs-o-up").removeClass("fa-thumbs-up")
-                        $a_like.find("span.like-num").text(response["count"])
-                    }
-                })
-            } else {
-                $.ajax({
-                    type: "POST",
-                    url: "/update_like",
-                    data: {
-                        post_id_give: post_id,
-                        type_give: type,
-                        action_give: "like"
-                    },
-                    success: function (response) {
-                        console.log("like")
-                        $i_like.addClass("fa-thumbs-up").removeClass("fa-thumbs-o-up")
-                        $a_like.find("span.like-num").text(response["count"])
-                    }
-                })
+
+                function sign_out() {
+            $.removeCookie = function (mytoken, param2) {
 
             }
-        }
-
-        function sign_out() {
             $.removeCookie('mytoken', {path: '/'});
-            alert('로그아웃 하셨습니다.!')
+            alert('로그아웃!')
             window.location.href = "/login"
         }
 
 
-        {#시간설정#}
-        function time2str(date) {
-            let today = new Date()
-            let time = (today - date) / 1000 / 60  // 분
-
-            if (time < 60) {
-                return parseInt(time) + "분 전"
-            }
-            time = time / 60  // 시간
-            if (time < 24) {
-                return parseInt(time) + "시간 전"
-            }
-            time = time / 24
-            if (time < 7) {
-                return parseInt(time) + "일 전"
-            }
-            return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`
-        }
-
-
-        function showArticles(username) {
-            if (username == undefined) {
-                 username = ""
-                 }
+        // DB에서 게시물 데이터 index 로 가져오기
+        function showArticles() {
             $.ajax({
                 type: "GET",
-                url: `/memo?username_give=${username}`,
+                url: "/memo",
                 data: {},
                 success: function (response) {
-
                     let drcar = response['drcars']
                     for (let i = 0; i < drcar.length; i++) {
+                        let username = drcar[i]['username']
 
+                        let name = drcar[i]['name']
                         let desc = drcar[i]['desc']
                         let price = drcar[i]['price']
                         let file = drcar[i]['file']
-                        let username = drcar[i]['username']
-                        let post = drcar[i]
-                        let class_heart = post['heart_by_me'] ? "fa-thumbs-up" : "fa-thumbs-o-up"
-                        let count_heart = drcar['count_heart']
-
+                        let star = drcar[i]['star']
 
                         let temp_html = `<div class="col">
                                             <div class="card">
-                                              <a href="/user/${post['username']}"><img src="../static/${file}" class="card-img-top" alt="..."></a>
+                                              <a data-bs-toggle="modal" data-bs-target="#exampleModal" class="openbtn" onclick="showmodal()"><img src="static/${file}" class="card-img-top" alt="..." style="background-color: RGBA(111, 110, 90, 0.2)"></a>
                                               <div class="card-body">
-                                                <h5 class="card-title">가격: ${price}</h5>
-                                               <h5 class="card-title">작성자:  ${username}</h5>
-                                                <p class="card-text">설명: ${desc}</p>
-                                                        <a class="level-item is-sparta" aria-label="thumbs-up" onclick="toggle_like('${post['_id']}', 'thumbs-up')">
-                                                            <span class="icon is-small"><i class="fa ${class_heart}"
-                                                                                           aria-hidden="true"></i></span>&nbsp;<span class="like-num">2.7k</span>
-                                                        </a>
+                                                <u><h5 class="card-title" style="margin-top: 5px">닉네임   :   ${username}</h5></u>
+                                                <u ><h5 class="card-title" style="margin-top: 5px" >모델   :   ${name}</h5></u>
+                                                <u><h5 class="card-title" style="margin-top: 5px">내용   :   ${desc}</h5></u>
+                                                <u><p class="card-title" style="margin-top: 5px">금액   :   ${price}</p></u>
+                                                <u><h5 class="card-title" style="margin-top: 5px">차종   :   ${star}</h5></u>
+
                                               </div>
                                             </div>
                                           </div>`
 
                         $('#here').append(temp_html)
+                        $('#posthere').append(temp_html)
+
                     }
                 }
             })
         }
 
+
+        // 모달 창 띄우기
+        function showmodal() {
+
+            $(".openbtn").click(function () {
+                $(".modal").fadeIn();
+            });
+
+            $(".level-item").click(function () {
+                $(".modal").fadeOut();
+            });
+        }
+
+        // 작성한 댓글 DB로 보내기
+        function regicomment() {
+
+            let comment = $('#post-comment').val()
+
+            $.ajax({
+                type: "POST",
+                url: "/cmt",
+                data: {comment_give: comment},
+                success: function (response) {
+
+                    alert(response["msg"])
+                    window.location.reload()
+                }
+            })
+        }
+
+        {#// DB 에서 댓글 가져오기#}
+
+        function showcomment() {
+            $.ajax({
+                type: "GET",
+                url: "/cmt",
+                data: {},
+                success: function (response) {
+
+                    let comment = response['comment']
+                    for (let i = 0; i < comment.length; i++) {
+
+                        let comment1 = comment[i]['comment']
+
+                        var someJavaScriptVar = '{{ user_info.username }}';
+                        {#if (username == someJavaScriptVar) {#}
+
+                            let temp_html = `<div class="card" style="width: 28rem; margin: auto">
+                                              <ul class="list-group list-group-flush">
+                                                <li class="list-group-item">${comment1} <strong style="float: right">누리꾼:${someJavaScriptVar}</strong></li>
+                                              </ul>
+                                            </div>`
+
+                            $('#cmthere').append(temp_html)
+                        }
+                    }
+                })
+        }
+
+
     </script>
 </head>
 
 <body>
+{# 헤더#}
+<section>
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-home" href="/">
+                <button class="button is-primary" style="margin-left: 26px">MyDreamCar</button>
+            </a>
 
-<nav class="navbar"  role="navigation" aria-label="main navigation">
-  <div class="navbar-brand">
-  <a class="button is-primary"  >
-            <strong>Sign up</strong>
-          </a>
-    <a class="navbar-item" href="https://bulma.io">11
-      <img src="https://bulma.io/images/bulma-logo.png" width="112" height="28">
-    </a>
-
-    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-    </a>
-  </div>
-
-  <div id="navbarBasicExample" class="navbar-menu">
-    <div class="navbar-start">
-      <a class="navbar-item">
-        Home
-      </a>
-
-      <a class="navbar-item">
-        Documentation
-      </a>
-
-      <div class="navbar-item has-dropdown is-hoverable">
-        <a class="navbar-link">
-          More
-        </a>
-
-        <div class="navbar-dropdown">
-          <a class="navbar-item">
-            About
-          </a>
-          <a class="navbar-item">
-            Jobs
-          </a>
-          <a class="navbar-item">
-            Contact
-          </a>
-          <hr class="navbar-divider">
-          <a class="navbar-item">
-            Report an issue
-          </a>
+            <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false"
+               data-target="navbarBasicExample">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
         </div>
-      </div>
-    </div>
 
-    <div class="navbar-end">
-      <div class="navbar-item">
-        <div class="buttons">
-          <a class="button is-primary">
-            <strong>Sign up</strong>
-          </a>
-          <a class="button is-light">
-            Log in
-          </a>
+        <div id="navbarBasicExample" class="navbar-menu">
+            <div class="navbar-start">
+            </div>
+
+            <div class="navbar-end">
+                <div class="navbar-item">
+                    <div class="buttons">
+                        <a class="button is-primary" href="/{{ user_info.username }}">
+                            <strong>{{ user_info.username }}님, 안녕하세요</strong>
+                        </a>
+                        <a class="button is-danger" onclick="sign_out()">
+                            로그아웃
+                        </a>
+
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  </div>
-</nav >
+    </nav>
+</section>
 
 <div class="title">
-    <h1><a href="/">My Dream Car</a></h1>
+    <h1>My Dream Car</h1>
 </div>
 
-<div class="header">
-    <h4 class="nick"><a href="/edit">Nick</a>
-        <button class="badge bg-secondary" onclick="sign_out()">로그아웃</button></h4>
+<a href="/register">
+    <button type="button" class="btn btn-outline-success">내 드림카 등록하기</button>
+</a>
 
+
+<div class="row row-cols-1 row-cols-md-4 g-4" id="here" style="padding: 30px">
 </div>
-<a class="btn text-muted" href="/register">내 드림카 등록하기</a>
-<p><a href="http://localhost:5000/webPro/index.html"></a></p>
 
 
-<div class="row row-cols-1 row-cols-md-4 g-4" id="here">
+<!--새로운 모달------->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">게시물</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div>
+                <div class="modal-body" id="posthere">
+                    <div class="card" style="width: 18rem;">
+                        <ul class="list-group list-group-flush">
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <p  id="cmthere"></p>
+            <div class="modal-footer" >
+                <div class="input-group mb-3">
+                    <input id="post-comment" type="text" class="form-control" placeholder="댓글을 입력해 주세요"
+                           aria-label="Username"
+                           aria-describedby="basic-addon1">
+                </div>
+                <div class="btnwrap">
+                    <button onclick="regicomment()" style="height: 40px;" type="button" class="btn2 btn-primary">댓글작성
+                    </button>
+                    <button style="height: 40px;" type="button" class="btn1 btn-secondary" data-bs-dismiss="modal">Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+
+
+</script>
 
 
 </body>
 
 </html>
+
+
+
+
+
