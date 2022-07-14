@@ -1,0 +1,193 @@
+<!Doctype html>
+<html lang="ko">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!--bulma-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+          crossorigin="anonymous">
+
+    <!-- JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+
+    <!-- 구글폰트 -->
+    <link href="https://fonts.googleapis.com/css?family=Stylish&display=swap" rel="stylesheet">
+
+
+    <title>MyDreamCar</title>
+
+    <!-- style -->
+    <style type="text/css">
+        * {
+            font-family: "Stylish", sans-serif;
+        }
+
+        body {
+            background-color: RGBA(111, 110, 90, 0.2);
+            min-height: 100vh;
+        }
+
+
+        .dispay {
+            background-image: url("https://image.cnbcfm.com/api/v1/image/106429544-1583520556948gemera_exterior_5_high.jpg?v=1583520680&w=740&h=416");
+            height: 300px;
+            width: 700px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: auto;
+            background-position: 1% center;
+            color: white;
+
+
+        }
+
+        .wrap {
+            width: 900px;
+            margin: auto;
+        }
+
+
+        #post-box {
+            width: 500px;
+            margin: 20px auto;
+            padding: 50px;
+            border: black solid;
+            border-radius: 5px;
+        }
+    </style>
+    <script>
+        //게시물 업로드 ajax POST
+        function postArticle() {
+
+            let name = $('#post-name').val()
+            let desc = $('#post-desc').val()
+            let price = $('#post-price').val()
+            let star = $('#post-star').val()
+
+            let file = $('#file')[0].files[0]
+            let form_data = new FormData()
+
+
+            form_data.append("name_give", name)
+            form_data.append("file_give", file)
+            form_data.append("desc_give", desc)
+            form_data.append("price_give", price)
+            form_data.append("star_give", star)
+
+            $.ajax({
+                type: "POST",
+                url: "/memo",
+                data: form_data,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    alert(response["msg"])
+                    window.location.href = "/"
+
+                }
+            });
+        }
+
+
+    </script>
+</head>
+
+<body>
+
+<!--네비게이션 바-->
+<section>
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-home" href="/">
+                <button class="button is-primary" style="margin-left: 26px">MyDreamCar</button>
+            </a>
+
+            <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false"
+               data-target="navbarBasicExample">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+
+        <div id="navbarBasicExample" class="navbar-menu">
+            <div class="navbar-start">
+            </div>
+
+            <div class="navbar-end">
+                <div class="navbar-item">
+                    <div class="buttons">
+                        <a class="button is-primary" href="/">
+                            <strong>닉네임</strong>
+                        </a>
+                        <a class="button is-danger" onclick="sign_out()">
+                            Log Out
+                        </a>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+</section>
+
+<div class="wrap">
+    <div class="dispay">
+        <h3>당신은 이미 운전석에 앉아있다</h3>
+    </div>
+    <!--게시물 업로드 박스-->
+    <div id="post-box" class="form-post">
+        <div>
+            <div class="form-group">
+                <div class="input-group mb-3">
+                    <input type="file" class="form-control" id="file">
+                    <label class="input-group-text" for="file">업로드</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="post-name">모델명</label>
+                <input id="post-name" class="form-control">
+            </div>
+            <div>
+                <label for="post-desc">내 드림카 자랑하기</label>
+                <textarea id="post-desc" class="form-control" rows="2"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="post-price">가격은?</label>
+                <input id="post-price" class="form-control" placeholder="만원 단위 입력">
+            </div>
+            <div class="input-group mb-3">
+                <label class="input-group-text" for="inputGroupSelect01">차종선택하기</label>
+                <select class="form-select" id="post-star">
+                    <option selected>-- 선택하기 --</option>
+                    <option value="소형">소형</option>
+                    <option value="중형">중형</option>
+                    <option value="대형">대형</option>
+                    <option value="세단">세단</option>
+                    <option value="경차">경차</option>
+                </select>
+            </div>
+            <button onclick="postArticle()" type="button" class="btn btn-outline-dark">차등록</button>
+            <a href="/">
+                <button type="button" class="btn btn-danger" style="float: right">뒤로가기</button>
+            </a>
+        </div>
+    </div>
+    <div id="cards-box" class="card-columns">
+    </div>
+</div>
+</body>
+
+</html>
