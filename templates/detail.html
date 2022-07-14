@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Stylish&display=swap" rel="stylesheet">
+
+    <title>마이 드림카</title>
+
+    <style>
+        * {
+            font-family: "Stylish", sans-serif;
+        }
+
+        body {
+            background-color: RGBA(111, 110, 90, 0.2);
+            min-height: 100vh;
+        }
+
+        .title {
+            color: white;
+            text-align: center;
+            height: 300px;
+            background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("http://kr.news.cn/2021-09/30/1310219320_16329713053141n.jpg");
+            background-position: center;
+            background-size: cover;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+        }
+
+        .header {
+            margin-left: 85%;
+        }
+
+        .badge {
+            margin: 10px;
+        }
+
+        .btn {
+            margin: 20px 20px 20px 85%;
+        }
+
+        .update_btn {
+            display: none;
+
+        }
+
+    </style>
+
+</head>
+<script>
+
+
+    $(function () {
+
+        $(".openbtn").click(function () {
+            $(".modal").fadeIn();
+        });
+
+        $(".modal_content").click(function () {
+            $(".modal").fadeOut();
+        });
+
+    });
+
+    {#로그아웃#}
+
+    function sign_out() {
+        $.removeCookie = function (mytoken, param2) {
+
+        }
+        $.removeCookie('mytoken', {path: '/'});
+        alert('로그아웃!')
+        window.location.href = "/login"
+    }
+
+    {#수정하기#}
+
+    function update_profile(id) {
+        let name = $('#input-name').val()
+        {#모델#}
+        let file = $('#input-pic')[0].files[0]
+        {#이미지#}
+        let about = $("#textarea-about").val()
+        {#자랑하기#}
+        let price = $("#price-name").val()
+        {#차종#}
+        let star = $("#star_update").val()
+        {#금액#}
+        let form_data = new FormData()
+
+        form_data.append("file_give", file)
+        form_data.append("name_give", name)
+        form_data.append("about_give", about)
+        form_data.append("price_give", price)
+        form_data.append("count_give", id)
+        form_data.append("star_give", star)
+        console.log(name, file, about, form_data, price, star)
+
+        $.ajax({
+            type: "POST",
+            url: "/update_profile",
+            data: form_data,
+            cache: false,
+            contentType: false,
+            processData: false,
+            success: function (response) {
+                if (response["result"] == "success") {
+                    alert(response["msg"])
+                    window.location.reload()
+
+                }
+            }
+        });
+    }
+
+    {#삭제#}
+
+    $(document).ready(function () {
+    });
+
+    function delete_article(delete_id) {
+        if (confirm('정말 삭제하시겠습니까?')) {
+            $.ajax({
+                type: "POST"
+                , url: "/delete_article"
+                , data: {
+                    delete_id: delete_id
+                }
+                , success: function (response) {
+                    if (response['result']) {
+                        alert(response['msg'])
+                        window.location.href = "/"
+                    } else {
+                        alert(response['msg'])
+                    }
+                }
+            });
+        }
+    }
+
+    $(document).ready(function () {
+        showArticles();
+    });
+
+
+    function showArticles() {
+        $.ajax({
+            type: "GET",
+            url: "/memo",
+            data: {},
+            success: function (response) {
+                let drcar = response['drcars']
+                for (let i = 0; i < drcar.length; i++) {
+                    let username = drcar[i]['username']
+                    let name = drcar[i]['name']
+                    let desc = drcar[i]['desc']
+                    let price = drcar[i]['price']
+                    let file = drcar[i]['file']
+                    let count = drcar[i]['count']
+                    let star = drcar[i]['star']
+
+                    {#유저가 작성한글 뽑기#}
+                    var someJavaScriptVar = '{{ user_info.username }}';
+                    var key_result = '{{user_info._id}}';
+                    if (username == someJavaScriptVar) {
+
+                        let temp_html = `<div class="col">
+                                <div class="card">
+                                <a data-bs-toggle="modal" data-bs-target="#exampleModal" class="openbtn"
+                                   onclick="showmodal()"><img src="static/${file}" class="card-img-top" alt="..."
+                                                              style="background-color: RGBA(111, 110, 90, 0.2)"></a>
+                                <div class="card-body">
+                                    <u><h5 class="card-title" style="margin-top: 5px">닉네임 : ${username}</h5></u>
+                                    <u><h5 class="card-title" style="margin-top: 5px">모델 : ${name}</h5></u>
+                                    <u><h5 class="card-title" style="margin-top: 5px">내용 : ${desc}</h5></u>
+                                    <u><p class="card-title" style="margin-top: 5px">금액 : ${price}</p></u>
+                                    <u><h5 class="card-title" style="margin-top: 5px">차종   :   ${star}</h5></u>
+
+                                    <div id="${count}">
+                                        <nav id="btns-me" class="level is-mobile" style="margin-top:2rem">
+                                            <a class="button level-item has-text-centered is-sparta"
+                                               onclick='$("#modal-edit").addClass("is-active")'>
+                                                수정하기&nbsp;&nbsp;&nbsp;<span class="icon is-small"></span>
+                                            </a>
+                                        </nav>
+                                    </div>
+                                    <div class="modal" id="modal-edit">
+                                        <div class="modal-background"
+                                             onclick='$("#modal-edit").removeClass("is-active")'></div>
+                                        <div class="modal-content">
+                                            <div class="box">
+                                                <article class="media">
+                                                    <div class="media-content">
+
+                                                        <div class="field">
+                                                            <label class="label" for="input-pic">수정해주세요</label>
+
+                                                            <div class="control is-expanded">
+                                                                <div class="file has-name">
+                                                                    <label class="file-label" style="width:100%">
+                                                                      <button class="update_btn">  <input id="input-pic" class="file-input"
+                                                                               type="file"
+                                                                               name="resume">
+
+                                                                                <span class="file-label">빈칸채우기</span>
+                                                                            <span id="file-name" class="file-name"
+                                                                                  style="width:100%;max-width:100%"> </span>
+                                                                    </label>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="field">
+                                                            <label class="label" for="input-name">모델</label>
+                                                            <p class="control">
+                                                                <input id="input-name" class="input"
+                                                                       placeholder="람보르기니">
+                                                            </p>
+                                                        </div>
+
+                                                        <div class="field">
+                                                            <label class="label" for="input-price">금액</label>
+                                                            <p class="control">
+                                                                <input id="price-name" class="input"
+                                                                       placeholder="1,000,000,000,000,000"">
+                                                                        </p>
+                                                                    </div>
+
+
+                                                                    <div class=" field">
+                                                                        <label class=" label" for=" textarea-about">내용</label>
+                                                                        <p class=" control">
+                                                                        <textarea id="textarea-about" class=" textarea"
+                                                                                  placeholder="글을 입력해주세요"></textarea>
+                                                                        </p>
+                                                                    </div>
+
+                                                                     <div class="input-group mb-3">
+                                                                                    <label class="input-group-text" for="inputGroupSelect01">차종선택하기</label>
+                                                                                    <select class="form-select" id="star_update">
+                                                                                        <option selected>-- 선택하기 --</option>
+                                                                                        <option value="소형">소형</option>
+                                                                                        <option value="중형">중형</option>
+                                                                                        <option value="대형">대형</option>
+                                                                                        <option value="세단">세단</option>
+                                                                                        <option value="경차">경차</option>
+                                                                                    </select>
+                                                                                </div>
+
+                                                                    <nav class=" level is-mobile">
+                                                                        <div class=" level-left">
+
+                                                                        </div>
+                                                                        <div class=" level-right">
+
+                                                                            <div class=" level-right">
+                                                                                <div class=" level-item">
+                                                                                    <a class=" button
+                                                                       is-sparta" onclick="
+                                                                       update_profile()">${key_result}업데이트</a>
+                                                        </div>
+                                                        <div class="level-item">
+                                                            <a class="button is-sparta is-outlined"
+                                                               onclick='$("#modal-edit").removeClass("is-active")'>취소</a>
+                                                        </div>
+                                                    </div>
+                                            </div>
+                                        </article>
+                                    </div>
+                                </div>
+                                <button class="modal-close is-large" aria-label="close"
+                                        onclick='$("#modal-edit").removeClass("is-active")'></button>
+                            </div>
+                        </div>
+                    </div>
+                    </div>`
+                        $('#here').append(temp_html)
+                    }
+                }
+            }
+        })
+    }
+
+
+</script>
+
+<body>
+{# 헤더#}
+<section>
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-home" href="/">
+                <button class="button is-primary" style="margin-left: 26px">MyDreamCar</button>
+            </a>
+
+            <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false"
+               data-target="navbarBasicExample">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+
+        <div id="navbarBasicExample" class="navbar-menu">
+            <div class="navbar-start">
+            </div>
+
+            <div class="navbar-end">
+                <div class="navbar-item">
+                    <div class="buttons">
+                        <a class="button is-primary" href="/{{ user_info.username }}">
+                            <strong>{{ user_info.username }}님, 안녕하세요</strong>
+                        </a>
+                        <a class="button is-danger" onclick="sign_out()">
+                            Log Out
+                        </a>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+</section>
+
+<div class="title">
+    <h1>My Dream Car</h1>
+</div>
+
+
+<div class="row row-cols-1 row-cols-md-4 g-4" id="here" style="padding: 30px">
+</div>
+{% if  status %}
+{% endif %}
+
+
+</body>
+
+</html>
